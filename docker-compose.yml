@@ -88,6 +88,29 @@ services:
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+  
+  flink-jobmanager:
+    image: flink:1.18.0-scala_2.12-java11
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+    depends_on:
+      - kafka
+
+  flink-taskmanager:
+    image: flink:1.18.0-scala_2.12-java11
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.numberOfTaskSlots: 2
+    depends_on:
+      - flink-jobmanager
 
 volumes:
   airflow-db-data:
